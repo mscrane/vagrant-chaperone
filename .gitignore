@@ -1,7 +1,7 @@
 # OS-specific
 .DS_Store
 galaxy_roles/*
-
+*.retry
 # Editor swapfiles
 .*.sw?
 *~
@@ -13,6 +13,7 @@ boxes/*
 /website/.vagrant
 /website/build
 /vagrant-spec.config.rb
+.vagrant/*
 
 # Bundler/Rubygems
 *.gem

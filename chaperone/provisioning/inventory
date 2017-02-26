@@ -1,5 +1,9 @@
 ---
-## Sample inventory 
+## Sample inventory
 
 [chaperone]
-# enter the ip address vagrant guest from 
+chaperone.dev
+
+[chaperone:vars]
+#ansible_ssh_host=192.168.110.10
+ansible_ssh_port=22

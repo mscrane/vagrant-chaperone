@@ -2,43 +2,57 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-
-USE_PROXY = false
-LOCAL_CHAPERONE_REPO = ENV["chaperone_repo"]
-
-GUEST_IP = "192.168.110.10"
-GUEST_HOSTNAME = "chaperone.dev"
+USE_PROXY               = ENV["CHAP_USE_PROXY"] || false
+LOCAL_CHAPERONE_REPO    = ENV["CHAP_LOCAL_REPO"] || "../../../../chaperone"
+GUEST_IP                = ENV["CHAP_GUEST_IP"] || "192.168.110.10"
+GUEST_HOSTNAME          = ENV["CHAP_VM_NAME"] || "chaperone.dev"
+HOST_PORT_ADMIN         = ENV["CHAP_HOST_ADMIN_PORT"] || 8181
+HOST_PORT_PROJECT       = ENV["CHAP_HOST_PROJECT_PORT"] || 8811
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box = "ubuntu/trusty64"
-  config.vm.network :private_network, ip: GUEST_IP
+  puts "==> Local Chaperone Repo ==> #{LOCAL_CHAPERONE_REPO}"
+  puts "==> Guest IP             ==> #{GUEST_IP}"
+  puts "==> Guest Hostname       ==> #{GUEST_HOSTNAME}"
+
+  if USE_PROXY
+    puts "==> Use proxy --> #{USE_PROXY}"
+  end
+
+  config.vm.box         = "ubuntu/trusty64"
+  config.vm.hostname    = GUEST_HOSTNAME
+  config.vm.hostname    = GUEST_HOSTNAME
   config.ssh.insert_key = false
-  config.vm.hostname = GUEST_HOSTNAME
+
+  config.vm.network :private_network, ip: GUEST_IP
+  config.vm.network "forwarded_port", guest: 80, host: HOST_PORT_PROJECT
+  config.vm.network "forwarded_port", guest: 8080, host: HOST_PORT_ADMIN
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
 
   # Sync local repo
-  config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vmware"
+  config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vagrant"
 
   config.vm.provider :virtualbox do |v|
-    v.name = "chaperone.dev"
+    v.name   = "chaperone.dev"
     v.memory = 2048
-    v.cpus = 2
+    v.cpus   = 1
     v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
   # Ansible provision
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "provisioning/chaperone_setup.yml"
-    ansible.inventory_path = "provisioning/inventory"
-    ansible.sudo = true
-    ansible.limit = "all"
+    ansible.playbook          = "provisioning/playbook.yml"
+    ansible.inventory_path    = "provisioning/inventory"
+    ansible.sudo              = true
+    ansible.limit             = "all"
     ansible.host_key_checking = false
-    ansible.verbose =  'vv'
-    ansible.extra_vars = { ansible_ssh_user: 'vagrant',
-                           ansible_connection: 'ssh',
-                           ansible_ssh_args: '-o ForwardAgent=yes'}
+    ansible.verbose           =  'vv'
+    ansible.extra_vars        = { ansible_ssh_host: GUEST_IP,
+                                  ansible_ssh_user: 'vagrant',
+                                  ansible_ssh_pass: 'vagrant',
+                                  ansible_connection: 'ssh',
+                                  ansible_ssh_args: '-o ForwardAgent=yes'}
   end
 
 end
