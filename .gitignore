@@ -13,6 +13,7 @@ boxes/*
 /website/.vagrant
 /website/build
 /vagrant-spec.config.rb
+.vagrant/*
 
 # Bundler/Rubygems
 *.gem
