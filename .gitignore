@@ -1,6 +1,7 @@
 # OS-specific
 .DS_Store
-*jdatx*
+galaxy_roles/*
+
 # Editor swapfiles
 .*.sw?
 *~
