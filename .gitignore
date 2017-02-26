@@ -1,6 +1,6 @@
 # OS-specific
 .DS_Store
-
+*jdatx*
 # Editor swapfiles
 .*.sw?
 *~
