@@ -1,0 +1,6 @@
+---
+- hosts:
+  vars_files:
+    - "{{ file }}"
+  roles:
+  
