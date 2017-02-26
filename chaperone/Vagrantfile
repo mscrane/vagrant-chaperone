@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+LOCAL_CHAPERONE_REPO = "/Users/jdupuy/bin/projects/vxrail"
+GUEST_IP = "192.168.110.10"
+GUEST_HOSTNAME = "chaperone.dev"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.network :private_network, ip: GUEST_IP
+  config.ssh.insert_key = false
+  config.vm.hostname = GUEST_HOSTNAME
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+
+  # Sync local repo
+  config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vmware"
+
+  config.vm.provider :virtualbox do |v|
+    v.name = "chaperone.dev"
+    v.memory = 2048
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    v.customize ["modifyvm", :id, "--ioapic", "on"]
+  end
+
+  # Ansible provision
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "provisioning/chaperone_setup.yml"
+    ansible.inventory_path = "provisioning/inventory"
+    ansible.sudo = true
+    ansible.limit = "all"
+    ansible.host_key_checking = false
+    ansible.verbose =  'vv'
+    ansible.extra_vars = { ansible_ssh_user: 'vagrant',
+                           ansible_connection: 'ssh',
+                           ansible_ssh_args: '-o ForwardAgent=yes'}
+  end
+
+end
