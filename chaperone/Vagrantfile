@@ -3,7 +3,9 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
-LOCAL_CHAPERONE_REPO = "/Users/jdupuy/bin/projects/vxrail"
+USE_PROXY = false
+LOCAL_CHAPERONE_REPO = ENV["chaperone_repo"]
+
 GUEST_IP = "192.168.110.10"
 GUEST_HOSTNAME = "chaperone.dev"
 
