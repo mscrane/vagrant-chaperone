@@ -1,24 +1,22 @@
 #!/bin/bash
 
 fail_script() {
-	local fail_message="$1"
-	local fail_code="$2"
+  local fail_message="$1"
+  local fail_code="$2"
 
-	echo -n "ERROR: "
-	if [ -z "$fail_message" ]; then
-		echo "Generic script failure."
-	else
-		echo "$fail_message"
-	fi
-
-	if [ -z "$fail_code" ]; then
-		fail_code=1
-	fi
-
-	exit $fail_code
+  echo -n "ERROR: "
+  if [ -z "$fail_message" ]; then
+    echo "Generic script failure."
+  else
+    echo "$fail_message"
+  fi
+ 
+  if [ -z "$fail_code" ]; then
+    fail_code=1
+  fi
+  exit $fail_code
 }
-### Set CHAP_* ENV variables
-#
+
 set_chap_env() {
   export CHAP_USE_PROXY='false'
   export CHAP_LOCAL_REPO="/Users/jdupuy/bin/projects/05"
@@ -27,10 +25,5 @@ set_chap_env() {
   export CHAP_HOST_ADMIN_PORT=8181
   export CHAP_HOST_PROJECT_PORT=8811
 }
-
-vagrant_up() {
-  vagrant up
-}
-
 
 set_chap_env || fail_script "Failed to set CHAP ENV" 1

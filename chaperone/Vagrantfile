@@ -21,7 +21,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box         = "ubuntu/trusty64"
   config.vm.hostname    = GUEST_HOSTNAME
-  config.vm.hostname    = GUEST_HOSTNAME
   config.ssh.insert_key = false
 
   config.vm.network :private_network, ip: GUEST_IP
@@ -29,15 +28,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "forwarded_port", guest: 8080, host: HOST_PORT_ADMIN
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
 
-  # Sync local repo
-  config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vagrant"
-
   config.vm.provider :virtualbox do |v|
-    v.name   = "chaperone.dev"
+    v.name   = GUEST_HOSTNAME
     v.memory = 2048
     v.cpus   = 1
     v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     v.customize ["modifyvm", :id, "--ioapic", "on"]
+  end
+
+  # Sync local repo
+  if ARGV[0] == "reload"
+    config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vmware",
+      owner: 'vmware', group: 'vmware'
   end
 
   # Ansible provision
@@ -54,5 +56,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                   ansible_connection: 'ssh',
                                   ansible_ssh_args: '-o ForwardAgent=yes'}
   end
-
 end
