@@ -2,10 +2,9 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-USE_PROXY               = ENV["CHAP_USE_PROXY"] || false
 LOCAL_CHAPERONE_REPO    = ENV["CHAP_LOCAL_REPO"] || "../../../../chaperone"
 GUEST_IP                = ENV["CHAP_GUEST_IP"] || "192.168.110.10"
-GUEST_HOSTNAME          = ENV["CHAP_VM_NAME"] || "chaperone.dev"
+GUEST_HOSTNAME          = ENV["CHAP_VM_NAME"] || "chaperone-ui.corp.local"
 HOST_PORT_ADMIN         = ENV["CHAP_HOST_ADMIN_PORT"] || 8181
 HOST_PORT_PROJECT       = ENV["CHAP_HOST_PROJECT_PORT"] || 8811
 
@@ -14,10 +13,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   puts "==> Local Chaperone Repo ==> #{LOCAL_CHAPERONE_REPO}"
   puts "==> Guest IP             ==> #{GUEST_IP}"
   puts "==> Guest Hostname       ==> #{GUEST_HOSTNAME}"
-
-  if USE_PROXY
-    puts "==> Use proxy --> #{USE_PROXY}"
-  end
 
   config.vm.box         = "ubuntu/trusty64"
   config.vm.hostname    = GUEST_HOSTNAME
@@ -36,7 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
-  # Sync local repo
+  # Sync local repo 
   if ARGV[0] == "reload"
     config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vmware",
       owner: 'vmware', group: 'vmware'
