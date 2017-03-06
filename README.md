@@ -31,14 +31,22 @@ Setup
 ```bash
 CHAP_GUEST_IP  chaperone-ui.corp.local
 ```
+
 4. Edit /etc/ansible/ansible.cfg
 ```bash
 roles_path = /etc/ansible/roles:<your_project_path>/containers/vagrant/vagrant_roles
 ```
+
 5. Source vagrant_setup.sh
 ```bash
 $ source vagrant_setup.sh <your_project_path>
 ```
+
+6. Run the command
+```bash
+ansible-galaxy install -p ../../vagrant/galaxy_roles -r requirements.yml
+```
+
 6. Edit inventory file <project_path>/chapdev/ansible/playbooks/examples/inventory
 ```bash
 [chaperone-ui]
