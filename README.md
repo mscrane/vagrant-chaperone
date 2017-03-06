@@ -31,17 +31,14 @@ Setup
 ```bash
 CHAP_GUEST_IP  chaperone-ui.corp.local
 ```
-
 4. Edit /etc/ansible/ansible.cfg
 ```bash
 roles_path = /etc/ansible/roles:<your_project_path>/containers/vagrant/vagrant_roles
 ```
-
 5. Source vagrant_setup.sh
 ```bash
 $ source vagrant_setup.sh <your_project_path>
 ```
-
 6. Edit inventory file <project_path>/chapdev/ansible/playbooks/examples/inventory
 ```bash
 [chaperone-ui]
@@ -57,12 +54,10 @@ localhost ansible_connection=local <== add this line
 #ansible_ssh_pass='VMware1!'
 #ansible_become_pass='VMware1!'
 ```
-
 7. Vagrant up
 ```bash
 $ vagrant up
 ```
-
 8. Sync project directory
 ```bash
 $ vagrant reload
