@@ -7,7 +7,7 @@ simply consuming an api. The roles/tasks involving OVA deployments may have late
 currently this role does not setup mounting local ova directory to the vagrant box.
 
 This role is using vagrant to instantiate an instance of the Chaperone automation tool kit.
-This role is using ansible to do the base configuration of the vagrant instance.
+This role is using ansible to do the base configuration of the vagrant instance. 
 
 Requirements
 ------------
