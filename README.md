@@ -7,7 +7,7 @@ simply consuming an api. The roles/tasks involving OVA deployments may have late
 currently this role does not setup mounting local ova directory to the vagrant box.
 
 This role is using vagrant to instantiate an instance of the Chaperone automation tool kit.
-This role is using ansible to do the base configuration of the vagrant instance. 
+This role is using ansible to do the base configuration of the vagrant instance.
 
 Requirements
 ------------
@@ -20,6 +20,11 @@ This role is currently supports and is tested on:
 CHAP_GUEST_IP is the IP address for the private network being setup for the Vagrant box
 <your_project_path> is the full path where you pulled down the chaperone repo usually
 in ~/projects
+
+TODO:
+------------
+[]add proxy support
+[]port forwarding for occasional auth issues
 
 Setup
 ------------
