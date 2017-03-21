@@ -23,8 +23,8 @@ in ~/projects
 
 TODO:
 ------------
-[]add proxy support
-[]port forwarding for occasional auth issues
+-[]add proxy support
+-[]port forwarding for occasional auth issues
 
 Setup
 ------------
