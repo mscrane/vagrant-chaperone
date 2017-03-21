@@ -11,7 +11,7 @@ This role is using ansible to do the base configuration of the vagrant instance.
 
 Requirements
 ------------
-This role is currently supports and is tested on:
+This role is currently uses and tested with:
 
 * Ubuntu 16.04.2 LTS
 * Vagrant 1.9.1
@@ -21,10 +21,6 @@ CHAP_GUEST_IP is the IP address for the private network being setup for the Vagr
 <your_project_path> is the full path where you pulled down the chaperone repo usually
 in ~/projects
 
-TODO:
-------------
--[]add proxy support
--[]port forwarding for occasional auth issues
 
 Setup
 ------------
@@ -71,7 +67,18 @@ localhost ansible_connection=local <== add this line
 ```bash
 $ vagrant up
 ```
-8. Sync project directory
+8. Sync project directory. This is kinda a hack. Need to set provisioning order.
 ```bash
 $ vagrant reload
 ```
+9. vagrant ssh
+10. Run some more commands. The 'examples/inventory' file should be the file you edited earlier.
+```bash
+~$ su vmware
+~$ cd ~/ansible/playbooks/ansible
+~$ ansible-playbook -K -k -i inventory ansible.yml
+~$ cd ../chaperone-ui/
+~$ ansible-playbook -K -k -i examples/inventory base.yml
+~$ ansible-playbook -i examples/inventory ui.yml
+```
+11. Open a supported browser (just not IE) and go to localhost:
