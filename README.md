@@ -85,4 +85,4 @@ localhost ansible_connection=local <== add this line
 ~$ ansible-playbook -K -k -i examples/inventory base.yml
 ~$ ansible-playbook -i examples/inventory ui.yml
 ```
-11. Open a supported browser (just not IE) and go to localhost:
+11. Open a supported browser (just not IE) and go to localhost:<your_admin_port>. Then got to localhost:<your_project_port>
