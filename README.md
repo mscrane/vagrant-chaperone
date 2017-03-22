@@ -28,27 +28,24 @@ Setup
 
 2. Install [ansible](http://docs.ansible.com/ansible/intro_installation.html) and any dependencies.
 
-3. Edit /etc/hosts file
+3. Edit and same the [chaperone_config.yml](chaperone_config.yml) file with your information for your environment
+
+4. Edit /etc/hosts file
 ```bash
 CHAP_GUEST_IP  chaperone-ui.corp.local
 ```
 
-4. Edit /etc/ansible/ansible.cfg
+5. Edit /etc/ansible/ansible.cfg
 ```bash
 roles_path = /etc/ansible/roles:<your_project_path>/containers/vagrant/vagrant_roles
 ```
 
-5. Source vagrant_setup.sh
-```bash
-$ source vagrant_setup.sh <your_project_path>
-```
-
 6. Run the command
 ```bash
-ansible-galaxy install -p ../../vagrant/galaxy_roles -r requirements.yml
+~$ ansible-galaxy install -p ../../vagrant/galaxy_roles -r requirements.yml
 ```
 
-6. Edit inventory file <project_path>/chapdev/ansible/playbooks/examples/inventory
+7. Edit inventory file <project_path>/chapdev/ansible/playbooks/examples/inventory
 ```bash
 [chaperone-ui]
 #chaperone-ui.corp.local           <== Comment out this line
@@ -63,16 +60,23 @@ localhost ansible_connection=local <== add this line
 #ansible_ssh_pass='VMware1!'
 #ansible_become_pass='VMware1!'
 ```
-7. Vagrant up
+
+8. Vagrant up
 ```bash
-$ vagrant up
+~$ vagrant up
 ```
-8. Sync project directory. This is kinda a hack. Need to set provisioning order.
+
+9. Sync project directory. This is kinda a hack. Need to set provisioning order.
 ```bash
-$ vagrant reload
+~$ vagrant reload
 ```
-9. vagrant ssh
-10. Run some more commands. The 'examples/inventory' file should be the file you edited earlier.
+
+10. Access your box
+```bash
+~$ vagrant ssh
+```
+
+11. Run some more commands. The 'examples/inventory' file should be the file you edited earlier.
 ```bash
 ~$ su vmware
 ~$ cd ~/ansible/playbooks/ansible

@@ -1,0 +1,11 @@
+---
+#### ipaddress used to create the private network
+CHAP_GUEST_IP: "192.168.110.10"
+#### full or relative path to projects folder
+CHAP_VM_NAME: "chaperone-ui.corp.local"
+#### port forwarded from host to guest admin ui
+CHAP_HOST_ADMIN_PORT: 8811
+#### port forwarded from host to guest project ui
+CHAP_HOST_PROJECT_PORT: 8181
+#### full path of the chaperone repo
+CHAP_LOCAL_REPO: "../../../../chaperone"

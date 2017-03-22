@@ -1,20 +1,68 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Read in the chaperone_config.yml file and set varibles for this
+# vagrant box specific to your local environment
+
+require 'yaml'
+
+config_file = '../chaperone_config.yml'
+
+config_keys = ['CHAP_GUEST_IP',
+               'CHAP_HOST_ADMIN_PORT',
+               'CHAP_HOST_PROJECT_PORT',
+               'CHAP_LOCAL_REPO',
+               'CHAP_VM_NAME']
+
+def config_file_present(file)
+  return File.exists?(file)
+end
+
+def load_config(file)
+  begin
+    configLoad = YAML.load_file(file)
+  rescue
+    puts 'Failed to load yaml'
+    return nil
+  end
+end
+
+def check_keys(yaml_load, valid_keys)
+  valid = true
+  yaml_load.each do |key, val|
+    valid = false unless valid_keys.include?(key)
+  end
+  return valid
+end
+
+def check_project_path(project_path)
+  return File.directory?(project_path)
+end
+
+unless config_file_present(config_file)
+  puts "Configuratino File Not found in ../chaperone_config.yml"
+  exit 1
+end
+
+CONFIG = load_config(config_file)
+
+unless check_keys(CONFIG, config_keys)
+  puts "Cannot Find correct configuration in ../chaperone_config.yml"
+  exit 1
+end
+
+unless check_project_path(CONFIG["CHAP_LOCAL_REPO"])
+  puts "Cannot find project path ../../../../<project_path>"
+  exit 1
+end
+
+## Used to configure the vagrant box
 VAGRANTFILE_API_VERSION = "2"
-
-#Defaults
-_GUEST_HOSTNAME         = "chaperone-ui.corp.local"
-_GUEST_IP               = "192.168.110.10"
-_LOCAL_CHAPERONE_REPO   = "~/projects/chaperone"
-_HOST_PORT_ADMIN        = 8181
-_HOST_PORT_PROJECT      = 8811
-
-LOCAL_CHAPERONE_REPO    = ENV["CHAP_LOCAL_REPO"] || _LOCAL_CHAPERONE_REPO
-GUEST_IP                = ENV["CHAP_GUEST_IP"] || _GUEST_IP
-GUEST_HOSTNAME          = ENV["CHAP_VM_NAME"] || _GUEST_HOSTNAME
-HOST_PORT_ADMIN         = ENV["CHAP_HOST_ADMIN_PORT"] || _HOST_PORT_ADMIN
-HOST_PORT_PROJECT       = ENV["CHAP_HOST_PROJECT_PORT"] || _HOST_PORT_PROJECT
+LOCAL_CHAPERONE_REPO    = CONFIG["CHAP_LOCAL_REPO"]
+GUEST_IP                = CONFIG["CHAP_GUEST_IP"]
+GUEST_HOSTNAME          = CONFIG["CHAP_VM_NAME"]
+HOST_PORT_ADMIN         = CONFIG["CHAP_HOST_ADMIN_PORT"]
+HOST_PORT_PROJECT       = CONFIG["CHAP_HOST_PROJECT_PORT"]
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -35,7 +83,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
-  # Sync local repo
+  # Sync local repo current work around, need to set provisioning order
   if ARGV[0] == "reload"
     config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vmware",
       owner: 'vmware', group: 'vmware'
