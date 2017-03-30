@@ -37,7 +37,7 @@ CHAP_GUEST_IP  chaperone-ui.corp.local
 
 5. Edit /etc/ansible/ansible.cfg
 ```bash
-roles_path = /etc/ansible/roles:<your_project_path>/containers/vagrant/vagrant_roles
+roles_path = /etc/ansible/roles:<your_project_path>/containers/vagrant/galaxy_roles
 ```
 
 6. Run the command
