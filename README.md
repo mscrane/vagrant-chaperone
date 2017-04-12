@@ -16,6 +16,7 @@ This role is currently uses and tested with:
 * Ubuntu 16.04.2 LTS
 * Vagrant 1.9.1
 * Ansible 2.2.1.0
+* Mac OSX 10.10.5
 
 CHAP_GUEST_IP is the IP address for the private network being setup for the Vagrant box
 <your_project_path> is the full path where you pulled down the chaperone repo usually
