@@ -9,3 +9,5 @@ CHAP_HOST_ADMIN_PORT: 8811
 CHAP_HOST_PROJECT_PORT: 8181
 #### full path of the chaperone repo
 CHAP_LOCAL_REPO: "../../../../chaperone"
+GIT_EMAIL: "mcrane@vmware.com"
+GIT_USERNAME: "Michael Crane"

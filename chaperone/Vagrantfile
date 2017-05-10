@@ -12,7 +12,10 @@ config_keys = ['CHAP_GUEST_IP',
                'CHAP_HOST_ADMIN_PORT',
                'CHAP_HOST_PROJECT_PORT',
                'CHAP_LOCAL_REPO',
-               'CHAP_VM_NAME']
+               'CHAP_VM_NAME',
+               'GIT_EMAIL',
+               'GIT_USERNAME'
+             ]
 
 def config_file_present(file)
   return File.exists?(file)
@@ -51,10 +54,10 @@ unless check_keys(CONFIG, config_keys)
   exit 1
 end
 
-unless check_project_path(CONFIG["CHAP_LOCAL_REPO"])
-  puts "Cannot find project path ../../../../<project_path>"
-  exit 1
-end
+#unless check_project_path(CONFIG["CHAP_LOCAL_REPO"])
+#  puts "Cannot find project path ../../../../<project_path>"
+#  exit 1
+#end
 
 ## Used to configure the vagrant box
 VAGRANTFILE_API_VERSION = "2"
@@ -63,17 +66,21 @@ GUEST_IP                = CONFIG["CHAP_GUEST_IP"]
 GUEST_HOSTNAME          = CONFIG["CHAP_VM_NAME"]
 HOST_PORT_ADMIN         = CONFIG["CHAP_HOST_ADMIN_PORT"]
 HOST_PORT_PROJECT       = CONFIG["CHAP_HOST_PROJECT_PORT"]
+GITCFG_EMAIL            = CONFIG["GIT_EMAIL"]
+GITCFG_USERNAME         = CONFIG["GIT_USERNAME"]
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box         = "ubuntu/trusty64"
+  config.vm.box         = "vmware/photon"
   config.vm.hostname    = GUEST_HOSTNAME
   config.ssh.insert_key = false
+  config.vm.box_version = "1.2.1"
+  config.vm.box_check_update = false
 
   config.vm.network :private_network, ip: GUEST_IP
-  config.vm.network "forwarded_port", guest: 80, host: HOST_PORT_PROJECT
-  config.vm.network "forwarded_port", guest: 8080, host: HOST_PORT_ADMIN
-  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  config.vm.network "forwarded_port", guest: 80, host: HOST_PORT_PROJECT, host_ip: '127.0.0.1'
+  config.vm.network "forwarded_port", guest: 8080, host: HOST_PORT_ADMIN, host_ip: '127.0.0.1'
+  config.vm.synced_folder ".", "/vagrant"
 
   config.vm.provider :virtualbox do |v|
     v.name   = GUEST_HOSTNAME
@@ -83,24 +90,46 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
+  config.vm.provider "vmware_workstation" do |v|
+    v.vmx["memsize"] = "2048"
+    v.vmx["numvcpus"] = "1"
+  end
+
   # Sync local repo current work around, need to set provisioning order
   if ARGV[0] == "reload"
     config.vm.synced_folder LOCAL_CHAPERONE_REPO, "/home/vmware",
       owner: 'vmware', group: 'vmware'
   end
 
+ config.vm.provision "shell", inline: "tdnf install -y git"
+ config.vm.provision "shell", inline: "git clone https://github.com/vmware/ansible-playbooks-chaperone chaperone"
+ config.vm.provision "shell", inline: "/bin/sh chaperone/devbox/photon_setup/photon.sh"
+ config.vm.provision "shell", inline: "/bin/sh chaperone/devbox/photon_setup/chaperone.sh"
+
+ config.vm.provision "shell" do |shell|
+   shell.inline = "git config --global user.email $1"
+   shell.args = GITCFG_EMAIL
+ end
+
+ config.vm.provision "shell" do |shell|
+   shell.inline = "git config --global user.name $1"
+   shell.args = GITCFG_USERNAME
+ end
+
+ config.vm.provision "shell", path: "setup-repo.sh"
+
   # Ansible provision
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook          = "provisioning/playbook.yml"
-    ansible.inventory_path    = "provisioning/inventory"
-    ansible.sudo              = true
-    ansible.limit             = "all"
-    ansible.host_key_checking = false
-    ansible.verbose           =  'vv'
-    ansible.extra_vars        = { ansible_ssh_host: GUEST_IP,
-                                  ansible_ssh_user: 'vagrant',
-                                  ansible_ssh_pass: 'vagrant',
-                                  ansible_connection: 'ssh',
-                                  ansible_ssh_args: '-o ForwardAgent=yes'}
-  end
+#  config.vm.provision "ansible" do |ansible|
+#    ansible.playbook          = "provisioning/playbook.yml"
+#    ansible.inventory_path    = "provisioning/inventory"
+#    ansible.sudo              = true
+#    ansible.limit             = "all"
+#    ansible.host_key_checking = false
+#    ansible.verbose           =  'vv'
+#    ansible.extra_vars        = { ansible_ssh_host: GUEST_IP,
+#                                  ansible_ssh_user: 'vagrant',
+#                                  ansible_ssh_pass: 'vagrant',
+#                                  ansible_connection: 'ssh',
+#                                  ansible_ssh_args: '-o ForwardAgent=yes'}
+#  end
 end
